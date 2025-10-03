@@ -15,6 +15,7 @@ static void cmd_mem(int argc, char** argv);
 static void cmd_reboot(int argc, char** argv);
 static void cmd_color(int argc, char** argv);
 static void cmd_uptime(int argc, char** argv);
+static void cmd_resolution(int argc, char** argv);
 
 command_t commands[] = {
     {"help", "Display available commands", cmd_help},
@@ -27,6 +28,7 @@ command_t commands[] = {
     {"reboot", "Restart the system", cmd_reboot},
     {"color", "Change text color (usage: color <fg> <bg>)", cmd_color},
     {"uptime", "Show system uptime", cmd_uptime},
+    {"resolution", "Change screen resolution (usage: resolution <mode>)", cmd_resolution},
 };
 
 int command_count = sizeof(commands) / sizeof(command_t);
@@ -248,5 +250,49 @@ static void cmd_uptime(int argc, char** argv) {
     itoa(seconds, buffer, 10);
     vga_write(buffer);
     vga_writeln("s");
+}
+
+static void cmd_resolution(int argc, char** argv) {
+    if (argc == 1) {
+        uint8_t width, height;
+        vga_get_resolution(&width, &height);
+        
+        char buffer[32];
+        vga_write("Current resolution: ");
+        itoa(width, buffer, 10);
+        vga_write(buffer);
+        vga_write("x");
+        itoa(height, buffer, 10);
+        vga_writeln(buffer);
+        
+        vga_writeln("");
+        vga_writeln("Available modes:");
+        vga_writeln("  0 - 80x25 (default)");
+        vga_writeln("  1 - 80x50 (more lines)");
+        vga_writeln("  2 - 40x25 (wider text)");
+        vga_writeln("");
+        vga_writeln("Usage: resolution <mode>");
+        return;
+    }
+    
+    int mode = atoi(argv[1]);
+    
+    if (mode < 0 || mode > 2) {
+        vga_set_color(VGA_COLOR_LIGHT_RED, VGA_COLOR_BLACK);
+        vga_writeln("Error: Invalid mode! Use 0, 1, or 2");
+        vga_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+        return;
+    }
+    
+    if (vga_set_mode((vga_mode_t)mode)) {
+        vga_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
+        vga_write("Resolution changed to: ");
+        vga_writeln(vga_get_mode_name((vga_mode_t)mode));
+        vga_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+    } else {
+        vga_set_color(VGA_COLOR_LIGHT_RED, VGA_COLOR_BLACK);
+        vga_writeln("Error: Failed to change resolution");
+        vga_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+    }
 }
 

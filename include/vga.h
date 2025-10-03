@@ -3,9 +3,13 @@
 
 #include "types.h"
 
-#define VGA_WIDTH 80
-#define VGA_HEIGHT 25
 #define VGA_MEMORY 0xB8000
+
+typedef enum {
+    VGA_MODE_80x25 = 0,
+    VGA_MODE_80x50 = 1,
+    VGA_MODE_40x25 = 2,
+} vga_mode_t;
 
 typedef enum {
     VGA_COLOR_BLACK = 0,
@@ -33,6 +37,9 @@ void vga_write(const char* str);
 void vga_writeln(const char* str);
 void vga_set_color(vga_color_t fg, vga_color_t bg);
 void vga_scroll(void);
+bool vga_set_mode(vga_mode_t mode);
+void vga_get_resolution(uint8_t* width, uint8_t* height);
+const char* vga_get_mode_name(vga_mode_t mode);
 
 #endif
 

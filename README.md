@@ -18,10 +18,11 @@ Sometimes the best way to learn is to start over with what you've learned.
 
 - Boots with GRUB multiboot
 - 32-bit protected mode kernel
-- VGA text mode display with colors
+- VGA text display with multiple resolutions (80x25, 80x50, 40x25)
+- 16-color support
 - PS/2 keyboard input
 - Timer interrupt (PIT)
-- Interactive shell with basic commands
+- Interactive shell with 11 commands
 - Clean, readable code
 
 ## Getting Started
@@ -54,6 +55,7 @@ docker-compose up build
 | `mem` | Memory usage |
 | `calc <a> <op> <b>` | Calculator (+, -, *, /) |
 | `color <fg> <bg>` | Change colors (0-15) |
+| `resolution <mode>` | Change screen resolution |
 | `reboot` | Restart |
 
 ## Project Structure
