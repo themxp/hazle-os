@@ -1,0 +1,14 @@
+build/
+isodir/
+*.iso
+*.bin
+*.o
+*.elf
+*.img
+.git/
+.gitignore
+*.md
+LICENSE
+.vscode/
+.idea/
+

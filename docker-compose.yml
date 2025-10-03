@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  build:
+    build: .
+    image: hazle-os-builder
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    command: make
+
+  run:
+    image: hazle-os-builder
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    command: qemu-system-i386 -cdrom hazle-os.iso -m 128M -vnc :0
+    ports:
+      - "5900:5900"
+
+  shell:
+    image: hazle-os-builder
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    command: /bin/bash
+    stdin_open: true
+    tty: true
+
+  clean:
+    image: hazle-os-builder
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    command: make clean
+

@@ -1,0 +1,87 @@
+#include "shell.h"
+#include "vga.h"
+#include "keyboard.h"
+#include "string.h"
+#include "kernel.h"
+
+static char input_buffer[SHELL_BUFFER_SIZE];
+static int buffer_pos = 0;
+
+extern command_t commands[];
+extern int command_count;
+
+void shell_init(void) {
+    buffer_pos = 0;
+    memset(input_buffer, 0, SHELL_BUFFER_SIZE);
+    register_commands();
+}
+
+void shell_print_prompt(void) {
+    vga_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
+    vga_write("hazle");
+    vga_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
+    vga_write("@");
+    vga_set_color(VGA_COLOR_LIGHT_BLUE, VGA_COLOR_BLACK);
+    vga_write("os");
+    vga_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
+    vga_write(":$ ");
+}
+
+static void execute_command(char* cmd) {
+    if (strlen(cmd) == 0) {
+        return;
+    }
+    
+    char* argv[MAX_ARGS];
+    int argc = 0;
+    
+    char* token = strtok(cmd, " ");
+    while (token != NULL && argc < MAX_ARGS) {
+        argv[argc++] = token;
+        token = strtok(NULL, " ");
+    }
+    
+    if (argc == 0) {
+        return;
+    }
+    
+    for (int i = 0; i < command_count; i++) {
+        if (strcmp(argv[0], commands[i].name) == 0) {
+            commands[i].handler(argc, argv);
+            return;
+        }
+    }
+    
+    vga_set_color(VGA_COLOR_LIGHT_RED, VGA_COLOR_BLACK);
+    vga_write("Unknown command: ");
+    vga_writeln(argv[0]);
+    vga_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+    vga_writeln("Type 'help' for available commands.");
+}
+
+void shell_run(void) {
+    shell_print_prompt();
+    
+    while (1) {
+        char c = keyboard_getchar();
+        
+        if (c == '\n') {
+            vga_putchar('\n');
+            input_buffer[buffer_pos] = '\0';
+            execute_command(input_buffer);
+            buffer_pos = 0;
+            memset(input_buffer, 0, SHELL_BUFFER_SIZE);
+            shell_print_prompt();
+        } else if (c == '\b') {
+            if (buffer_pos > 0) {
+                buffer_pos--;
+                input_buffer[buffer_pos] = '\0';
+                vga_putchar('\b');
+            }
+        } else if (buffer_pos < SHELL_BUFFER_SIZE - 1) {
+            input_buffer[buffer_pos++] = c;
+            vga_putchar(c);
+        }
+    }
+}
+
