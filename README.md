@@ -132,7 +132,6 @@ This is a **simple educational OS**. It lacks:
 - **Clean**: Well-organized, modular structure
 - **Educational**: Designed specifically for learning
 - **Complete**: Boot to shell, everything from scratch
-- **Modern tools**: Works with Docker, QEMU, modern compilers
 
 ## Extending This OS
 
