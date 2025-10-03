@@ -1,5 +1,9 @@
 # Hazle OS
 
+![Test Build](https://github.com/mateuphinxx/hazle-os/workflows/Test%20Build/badge.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+![Architecture](https://img.shields.io/badge/arch-x86--32bit-orange.svg)
+
 A simple x86 operating system built from scratch for learning purposes.
 
 ## What is this?
@@ -145,6 +149,15 @@ Want to add more? Try:
 - PC speaker driver (beep sounds)
 
 See [OSDev Wiki](https://wiki.osdev.org) for tutorials.
+
+## CI/CD
+
+This project uses GitHub Actions for automated testing and releases:
+
+- **Automatic Testing**: Runs on every commit and weekly schedule
+- **Manual Release**: Trigger manually via GitHub Actions with version tag
+
+See `.github/workflows/` for details.
 
 ## License
 
