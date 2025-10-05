@@ -1,0 +1,31 @@
+name: Docker Image CI
+
+on:
+  push:
+    paths:
+      - 'Dockerfile'
+      - '.github/workflows/docker-build.yml'
+  pull_request:
+    paths:
+      - 'Dockerfile'
+  workflow_dispatch:
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Build Docker image
+      run: docker build -t hazle-os-builder .
+      
+    - name: Test Docker image
+      run: |
+        docker run --rm hazle-os-builder nasm --version
+        docker run --rm hazle-os-builder gcc --version
+        docker run --rm hazle-os-builder make --version
+        docker run --rm hazle-os-builder qemu-system-i386 --version
+        echo "✓ All build tools verified"
+

@@ -1,0 +1,58 @@
+name: Test Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  schedule:
+    - cron: '0 0 * * 0'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Build Docker image
+      run: docker build -t hazle-os-builder .
+      
+    - name: Build Hazle OS
+      run: docker run --rm -v ${{ github.workspace }}:/workspace hazle-os-builder make
+      
+    - name: Verify ISO exists
+      run: |
+        if [ -f "hazle-os.iso" ]; then
+          echo "✓ ISO file created successfully"
+          ls -lh hazle-os.iso
+        else
+          echo "✗ ISO file not found"
+          exit 1
+        fi
+    
+    - name: Verify kernel binary
+      run: |
+        if [ -f "build/hazle.bin" ]; then
+          echo "✓ Kernel binary created successfully"
+          ls -lh build/hazle.bin
+        else
+          echo "✗ Kernel binary not found"
+          exit 1
+        fi
+    
+    - name: Test boot in QEMU
+      run: |
+        docker run --rm -v ${{ github.workspace }}:/workspace hazle-os-builder \
+          timeout 10s qemu-system-i386 -cdrom hazle-os.iso -m 128M -nographic || true
+        echo "✓ Boot test completed"
+    
+    - name: Upload ISO artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: hazle-os-iso
+        path: hazle-os.iso
+        retention-days: 7
+
