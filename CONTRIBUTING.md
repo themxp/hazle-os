@@ -45,6 +45,4 @@ Reads time from CMOS real-time clock
 
 Open an issue.
 
----
 
-Thanks for contributing to educational software!

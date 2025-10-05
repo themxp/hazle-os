@@ -21,7 +21,7 @@ ALL_OBJECTS = $(ASM_OBJECTS) $(KERNEL_OBJECTS)
 KERNEL_BIN = $(BUILD_DIR)/hazle.bin
 ISO_IMAGE = hazle-os.iso
 
-.PHONY: all clean run iso
+.PHONY: all clean run run-fullhd debug iso
 
 all: $(ISO_IMAGE)
 
@@ -42,7 +42,12 @@ $(ISO_IMAGE): $(KERNEL_BIN)
 	cp $(KERNEL_BIN) $(ISO_DIR)/boot/hazle.bin
 	echo 'set timeout=0' > $(BOOT_DIR)/grub.cfg
 	echo 'set default=0' >> $(BOOT_DIR)/grub.cfg
-	echo 'menuentry "Hazle OS" {' >> $(BOOT_DIR)/grub.cfg
+	echo 'set gfxmode=1920x1080x32' >> $(BOOT_DIR)/grub.cfg
+	echo 'set gfxpayload=keep' >> $(BOOT_DIR)/grub.cfg
+	echo 'insmod vbe' >> $(BOOT_DIR)/grub.cfg
+	echo 'insmod vga' >> $(BOOT_DIR)/grub.cfg
+	echo 'terminal_output gfxterm' >> $(BOOT_DIR)/grub.cfg
+	echo 'menuentry "Hazle OS - Graphics Mode" {' >> $(BOOT_DIR)/grub.cfg
 	echo '    multiboot /boot/hazle.bin' >> $(BOOT_DIR)/grub.cfg
 	echo '}' >> $(BOOT_DIR)/grub.cfg
 	grub-mkrescue -o $(ISO_IMAGE) $(ISO_DIR)
@@ -51,8 +56,11 @@ clean:
 	rm -rf $(BUILD_DIR) $(ISO_DIR) $(ISO_IMAGE)
 
 run: $(ISO_IMAGE)
-	qemu-system-i386 -cdrom $(ISO_IMAGE) -m 128M
+	qemu-system-i386 -cdrom $(ISO_IMAGE) -m 256M -vga std
+
+run-fullhd: $(ISO_IMAGE)
+	qemu-system-i386 -cdrom $(ISO_IMAGE) -m 256M -vga std -full-screen
 
 debug: $(ISO_IMAGE)
-	qemu-system-i386 -cdrom $(ISO_IMAGE) -m 128M -s -S
+	qemu-system-i386 -cdrom $(ISO_IMAGE) -m 256M -vga std -s -S
 
