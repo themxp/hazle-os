@@ -17,6 +17,7 @@ command_t commands[] = {
     {"date", "Show current date and time", cmd_date},
     {"beep", "Play a beep sound (usage: beep [frequency] [duration])", cmd_beep},
     {"random", "Generate random number (usage: random [max])", cmd_random},
+    {"debug", "Display debug information", cmd_debug},
 };
 
 int command_count = sizeof(commands) / sizeof(command_t);
