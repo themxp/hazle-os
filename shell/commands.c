@@ -1,7 +1,7 @@
 #include "shell.h"
 #include "commands.h"
 
-// Command registry - all individual commands are now in separate files
+
 command_t commands[] = {
     {"help", "Display available commands", cmd_help},
     {"clear", "Clear the screen", cmd_clear},
@@ -22,6 +22,4 @@ command_t commands[] = {
 int command_count = sizeof(commands) / sizeof(command_t);
 
 void register_commands(void) {
-    // All commands are statically registered in the array above
-    // Individual command implementations are in shell/commands/ directory
 }
