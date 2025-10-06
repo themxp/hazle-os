@@ -19,4 +19,5 @@ void cmd_date(int argc, char** argv);
 void cmd_beep(int argc, char** argv);
 void cmd_random(int argc, char** argv);
 void cmd_debug(int argc, char** argv);
+
 #endif
