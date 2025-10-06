@@ -36,11 +36,9 @@ void speaker_stop(void) {
 void speaker_beep(uint32_t frequency, uint32_t duration_ms) {
     speaker_play_tone(frequency);
     
-    uint32_t start_ticks = timer_get_ticks();
-    uint32_t target_ticks = start_ticks + (duration_ms * TIMER_FREQUENCY / 1000);
-    
-    while (timer_get_ticks() < target_ticks) {
-        __asm__ volatile("hlt");
+    uint32_t delay_count = duration_ms * 1000;
+    for (uint32_t i = 0; i < delay_count; i++) {
+        __asm__ volatile("nop");
     }
     
     speaker_stop();

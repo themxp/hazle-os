@@ -10,7 +10,7 @@ BUILD_DIR = build
 ISO_DIR = isodir
 BOOT_DIR = $(ISO_DIR)/boot/grub
 
-KERNEL_SOURCES = $(wildcard kernel/*.c) $(wildcard drivers/*.c) $(wildcard shell/*.c) $(wildcard lib/*.c)
+KERNEL_SOURCES = $(wildcard kernel/*.c) $(wildcard drivers/*.c) $(wildcard shell/*.c) $(wildcard shell/commands/*.c) $(wildcard lib/*.c)
 ASM_SOURCES = $(wildcard boot/*.asm) $(wildcard kernel/*.asm)
 
 KERNEL_OBJECTS = $(patsubst %.c,$(BUILD_DIR)/%.o,$(KERNEL_SOURCES))
@@ -26,19 +26,19 @@ ISO_IMAGE = hazle-os.iso
 all: $(ISO_IMAGE)
 
 $(BUILD_DIR)/%.o: %.asm
-	@mkdir -p $(dir $@)
+	@-mkdir -p $(dir $@) 2>/dev/null || true
 	$(ASM) $(ASMFLAGS) $< -o $@
 
 $(BUILD_DIR)/%.o: %.c
-	@mkdir -p $(dir $@)
+	@-mkdir -p $(dir $@) 2>/dev/null || true
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(KERNEL_BIN): $(ALL_OBJECTS)
-	@mkdir -p $(BUILD_DIR)
+	@-mkdir -p $(BUILD_DIR) 2>/dev/null || true
 	$(LD) $(LDFLAGS) -o $@ $(ALL_OBJECTS)
 
 $(ISO_IMAGE): $(KERNEL_BIN)
-	@mkdir -p $(BOOT_DIR)
+	@-mkdir -p $(BOOT_DIR) 2>/dev/null || true
 	cp $(KERNEL_BIN) $(ISO_DIR)/boot/hazle.bin
 	echo 'set timeout=0' > $(BOOT_DIR)/grub.cfg
 	echo 'set default=0' >> $(BOOT_DIR)/grub.cfg
