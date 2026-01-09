@@ -364,3 +364,54 @@ bool fat32_update_entry_size(uint32_t dir_cluster, const char* name, uint32_t ne
     
     return false;
 }
+
+bool fat32_update_entry_cluster(uint32_t dir_cluster, const char* name, uint32_t new_cluster) {
+    fat32_fs_t* fs = fat32_get_fs();
+    
+    uint32_t current_cluster = dir_cluster;
+    
+    while (current_cluster >= 2 && !fat32_is_eoc(current_cluster)) {
+        if (!fat32_read_cluster(current_cluster, dir_cluster_buffer)) {
+            return false;
+        }
+        
+        int entries_per_cluster = fs->bytes_per_cluster / 32;
+        
+        for (int i = 0; i < entries_per_cluster; i++) {
+            fat32_dir_entry_t* entry = (fat32_dir_entry_t*)(dir_cluster_buffer + i * 32);
+            
+            if (entry->name[0] == FAT32_ENTRY_END) {
+                return false;
+            }
+            
+            if ((uint8_t)entry->name[0] == FAT32_ENTRY_FREE || entry->attributes == FAT32_ATTR_LFN) {
+                continue;
+            }
+            
+            char entry_name[13];
+            short_name_to_string(entry->name, entry_name);
+            
+            char name_upper[256];
+            char entry_upper[13];
+            strcpy(name_upper, name);
+            strcpy(entry_upper, entry_name);
+            
+            for (int j = 0; name_upper[j]; j++) {
+                if (name_upper[j] >= 'a' && name_upper[j] <= 'z') name_upper[j] -= 32;
+            }
+            for (int j = 0; entry_upper[j]; j++) {
+                if (entry_upper[j] >= 'a' && entry_upper[j] <= 'z') entry_upper[j] -= 32;
+            }
+            
+            if (strcmp(name_upper, entry_upper) == 0) {
+                entry->first_cluster_high = (new_cluster >> 16) & 0xFFFF;
+                entry->first_cluster_low = new_cluster & 0xFFFF;
+                return fat32_write_cluster(current_cluster, dir_cluster_buffer);
+            }
+        }
+        
+        current_cluster = fat32_get_fat_entry(current_cluster);
+    }
+    
+    return false;
+}

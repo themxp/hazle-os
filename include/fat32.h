@@ -109,14 +109,17 @@ typedef struct {
 
 typedef struct {
     bool     in_use;
+    bool     dirty;
     uint32_t first_cluster;
     uint32_t current_cluster;
     uint32_t current_sector;
     uint32_t position;
     uint32_t size;
+    uint32_t original_size;
     uint8_t  attributes;
     uint32_t parent_cluster;
     uint32_t entry_offset;
+    char     filename[64];
 } fat32_file_t;
 
 typedef struct {

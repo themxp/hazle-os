@@ -30,6 +30,7 @@ void cmd_rm(int argc, char** argv);
 void cmd_cp(int argc, char** argv);
 void cmd_mv(int argc, char** argv);
 void cmd_disk(int argc, char** argv);
+void cmd_write(int argc, char** argv);
 
 #endif
 

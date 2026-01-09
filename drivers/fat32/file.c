@@ -12,6 +12,7 @@ extern bool fat32_find_entry(uint32_t dir_cluster, const char* name, fat32_file_
 extern bool fat32_create_entry(uint32_t dir_cluster, const char* name, uint8_t attributes, uint32_t first_cluster, uint32_t size);
 extern bool fat32_delete_entry(uint32_t dir_cluster, const char* name);
 extern bool fat32_update_entry_size(uint32_t dir_cluster, const char* name, uint32_t new_size);
+extern bool fat32_update_entry_cluster(uint32_t dir_cluster, const char* name, uint32_t new_cluster);
 extern bool fat32_sync_fat(void);
 
 static fat32_file_t open_files[FAT32_MAX_OPEN_FILES];
@@ -112,13 +113,17 @@ int fat32_open(const char* path) {
     
     fat32_file_t* file = &open_files[fd];
     file->in_use = true;
+    file->dirty = false;
     file->first_cluster = info.first_cluster;
     file->current_cluster = info.first_cluster;
     file->current_sector = 0;
     file->position = 0;
     file->size = info.size;
+    file->original_size = info.size;
     file->attributes = info.attributes;
     file->parent_cluster = dir_cluster;
+    strncpy(file->filename, filename, 63);
+    file->filename[63] = '\0';
     
     return fd;
 }
@@ -237,6 +242,7 @@ int fat32_write(int fd, const void* buffer, uint32_t size) {
         
         if (file->position > file->size) {
             file->size = file->position;
+            file->dirty = true;
         }
         
         if (file->position % fs->bytes_per_cluster == 0 && bytes_written < size) {
@@ -265,6 +271,14 @@ void fat32_close(int fd) {
     fat32_file_t* file = &open_files[fd];
     if (!file->in_use) {
         return;
+    }
+    
+    if (file->dirty && file->size != file->original_size) {
+        fat32_update_entry_size(file->parent_cluster, file->filename, file->size);
+        
+        if (file->first_cluster >= 2 && file->original_size == 0) {
+            fat32_update_entry_cluster(file->parent_cluster, file->filename, file->first_cluster);
+        }
     }
     
     fat32_sync_fat();
