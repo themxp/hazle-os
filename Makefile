@@ -10,7 +10,7 @@ BUILD_DIR = build
 ISO_DIR = isodir
 BOOT_DIR = $(ISO_DIR)/boot/grub
 
-KERNEL_SOURCES = $(wildcard kernel/*.c) $(wildcard drivers/*.c) $(wildcard shell/*.c) $(wildcard shell/commands/*.c) $(wildcard lib/*.c)
+KERNEL_SOURCES = $(wildcard kernel/*.c) $(wildcard drivers/*.c) $(wildcard drivers/fat32/*.c) $(wildcard shell/*.c) $(wildcard shell/commands/*.c) $(wildcard lib/*.c)
 ASM_SOURCES = $(wildcard boot/*.asm) $(wildcard kernel/*.asm)
 
 KERNEL_OBJECTS = $(patsubst %.c,$(BUILD_DIR)/%.o,$(KERNEL_SOURCES))
@@ -20,8 +20,9 @@ ALL_OBJECTS = $(ASM_OBJECTS) $(KERNEL_OBJECTS)
 
 KERNEL_BIN = $(BUILD_DIR)/hazle.bin
 ISO_IMAGE = hazle-os.iso
+DISK_IMAGE = disk.img
 
-.PHONY: all clean run run-fullhd debug iso
+.PHONY: all clean run run-fullhd debug iso disk run-disk
 
 all: $(ISO_IMAGE)
 
@@ -52,15 +53,25 @@ $(ISO_IMAGE): $(KERNEL_BIN)
 	echo '}' >> $(BOOT_DIR)/grub.cfg
 	grub-mkrescue -o $(ISO_IMAGE) $(ISO_DIR)
 
+$(DISK_IMAGE):
+	dd if=/dev/zero of=$(DISK_IMAGE) bs=1M count=64
+	mkfs.fat -F 32 $(DISK_IMAGE)
+
+disk: $(DISK_IMAGE)
+
 clean:
-	rm -rf $(BUILD_DIR) $(ISO_DIR) $(ISO_IMAGE)
+	rm -rf $(BUILD_DIR) $(ISO_DIR) $(ISO_IMAGE) $(DISK_IMAGE)
 
 run: $(ISO_IMAGE)
 	qemu-system-i386 -cdrom $(ISO_IMAGE) -m 256M -vga std
+
+run-disk: $(ISO_IMAGE) $(DISK_IMAGE)
+	qemu-system-i386 -cdrom $(ISO_IMAGE) -m 256M -vga std -drive file=$(DISK_IMAGE),format=raw,if=ide
 
 run-fullhd: $(ISO_IMAGE)
 	qemu-system-i386 -cdrom $(ISO_IMAGE) -m 256M -vga std -full-screen
 
 debug: $(ISO_IMAGE)
 	qemu-system-i386 -cdrom $(ISO_IMAGE) -m 256M -vga std -s -S
+
 

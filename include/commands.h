@@ -20,4 +20,16 @@ void cmd_beep(int argc, char** argv);
 void cmd_random(int argc, char** argv);
 void cmd_debug(int argc, char** argv);
 
+void cmd_ls(int argc, char** argv);
+void cmd_cd(int argc, char** argv);
+void cmd_pwd(int argc, char** argv);
+void cmd_cat(int argc, char** argv);
+void cmd_mkdir(int argc, char** argv);
+void cmd_touch(int argc, char** argv);
+void cmd_rm(int argc, char** argv);
+void cmd_cp(int argc, char** argv);
+void cmd_mv(int argc, char** argv);
+void cmd_disk(int argc, char** argv);
+
 #endif
+

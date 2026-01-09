@@ -18,6 +18,16 @@ command_t commands[] = {
     {"beep", "Play a beep sound (usage: beep [frequency] [duration])", cmd_beep},
     {"random", "Generate random number (usage: random [max])", cmd_random},
     {"debug", "Display debug information", cmd_debug},
+    {"ls", "List directory contents", cmd_ls},
+    {"cd", "Change directory", cmd_cd},
+    {"pwd", "Print working directory", cmd_pwd},
+    {"cat", "Display file contents", cmd_cat},
+    {"mkdir", "Create directory", cmd_mkdir},
+    {"touch", "Create empty file", cmd_touch},
+    {"rm", "Delete file or directory", cmd_rm},
+    {"cp", "Copy file (usage: cp <src> <dst>)", cmd_cp},
+    {"mv", "Move/rename file (usage: mv <src> <dst>)", cmd_mv},
+    {"disk", "Display disk information", cmd_disk},
 };
 
 int command_count = sizeof(commands) / sizeof(command_t);
