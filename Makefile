@@ -51,7 +51,7 @@ $(ISO_IMAGE): $(KERNEL_BIN)
 	echo 'menuentry "Hazle OS - Graphics Mode" {' >> $(BOOT_DIR)/grub.cfg
 	echo '    multiboot /boot/hazle.bin' >> $(BOOT_DIR)/grub.cfg
 	echo '}' >> $(BOOT_DIR)/grub.cfg
-	grub-mkrescue -o $(ISO_IMAGE) $(ISO_DIR)
+	grub2-mkrescue -o $(ISO_IMAGE) $(ISO_DIR)
 
 $(DISK_IMAGE):
 	dd if=/dev/zero of=$(DISK_IMAGE) bs=1M count=64
@@ -66,7 +66,7 @@ run: $(ISO_IMAGE)
 	qemu-system-i386 -cdrom $(ISO_IMAGE) -m 256M -vga std
 
 run-disk: $(ISO_IMAGE) $(DISK_IMAGE)
-	qemu-system-i386 -cdrom $(ISO_IMAGE) -m 256M -vga std -drive file=$(DISK_IMAGE),format=raw,if=ide
+	qemu-system-i386 -cdrom $(ISO_IMAGE) -m 256M -vga std -boot d -drive file=$(DISK_IMAGE),format=raw,if=ide
 
 run-fullhd: $(ISO_IMAGE)
 	qemu-system-i386 -cdrom $(ISO_IMAGE) -m 256M -vga std -full-screen

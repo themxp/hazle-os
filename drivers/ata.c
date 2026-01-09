@@ -67,7 +67,7 @@ bool ata_identify(uint16_t io_base, bool master, ata_drive_t* drive) {
     
     uint16_t identify_data[256];
     for (int i = 0; i < 256; i++) {
-        identify_data[i] = inb(io_base + ATA_REG_DATA) | (inb(io_base + ATA_REG_DATA) << 8);
+        identify_data[i] = inw(io_base + ATA_REG_DATA);
     }
     
     drive->present = true;
@@ -121,9 +121,7 @@ bool ata_read_sectors(ata_drive_t* drive, uint32_t lba, uint8_t count, void* buf
         }
         
         for (int i = 0; i < 256; i++) {
-            uint16_t data = inb(drive->io_base + ATA_REG_DATA);
-            data |= (uint16_t)inb(drive->io_base + ATA_REG_DATA) << 8;
-            buf[sector * 256 + i] = data;
+            buf[sector * 256 + i] = inw(drive->io_base + ATA_REG_DATA);
         }
     }
     
@@ -155,9 +153,7 @@ bool ata_write_sectors(ata_drive_t* drive, uint32_t lba, uint8_t count, const vo
         }
         
         for (int i = 0; i < 256; i++) {
-            uint16_t data = buf[sector * 256 + i];
-            outb(drive->io_base + ATA_REG_DATA, data & 0xFF);
-            outb(drive->io_base + ATA_REG_DATA, (data >> 8) & 0xFF);
+            outw(drive->io_base + ATA_REG_DATA, buf[sector * 256 + i]);
         }
     }
     

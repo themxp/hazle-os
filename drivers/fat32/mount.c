@@ -5,6 +5,7 @@
 extern bool fat32_parse_bpb(void);
 extern void fat32_init_files(void);
 extern void fat32_invalidate_fat_cache(void);
+extern bool fat32_sync_fat(void);
 
 static fat32_fs_t fs;
 

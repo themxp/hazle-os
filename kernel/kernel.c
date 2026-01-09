@@ -80,7 +80,7 @@ void kernel_main(uint32_t magic, uint32_t addr) {
     display_writeln("Welcome to Hazle OS!");
     display_writeln("");
     display_set_color(DISPLAY_COLOR_DARK_GREY, DISPLAY_COLOR_BLACK);
-    display_writeln("Repository: https://github.com/mateuphinxx/hazle-os");
+    display_writeln("Repository: https://github.com/themxp/hazle-os");
     display_set_color(DISPLAY_COLOR_LIGHT_GREY, DISPLAY_COLOR_BLACK);
     display_writeln("");
     display_writeln("Type 'help' to see available commands.");

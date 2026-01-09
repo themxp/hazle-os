@@ -12,6 +12,7 @@ extern bool fat32_find_entry(uint32_t dir_cluster, const char* name, fat32_file_
 extern bool fat32_create_entry(uint32_t dir_cluster, const char* name, uint8_t attributes, uint32_t first_cluster, uint32_t size);
 extern bool fat32_delete_entry(uint32_t dir_cluster, const char* name);
 extern bool fat32_update_entry_size(uint32_t dir_cluster, const char* name, uint32_t new_size);
+extern bool fat32_sync_fat(void);
 
 static fat32_file_t open_files[FAT32_MAX_OPEN_FILES];
 static uint8_t file_cluster_buffer[4096 * 8];
