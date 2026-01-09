@@ -199,24 +199,32 @@ int fat32_write(int fd, const void* buffer, uint32_t size) {
         }
         file->first_cluster = new_cluster;
         file->current_cluster = new_cluster;
+        file->dirty = true;
         
         memset(file_cluster_buffer, 0, fs->bytes_per_cluster);
-        fat32_write_cluster(new_cluster, file_cluster_buffer);
+        if (!fat32_write_cluster(new_cluster, file_cluster_buffer)) {
+            return -1;
+        }
     }
     
     while (bytes_written < size) {
-        if (file->current_cluster == 0 || fat32_is_eoc(file->current_cluster)) {
-            uint32_t new_cluster = fat32_allocate_cluster();
-            if (new_cluster == 0) {
-                break;
-            }
-            
-            if (file->current_cluster >= 2 && fat32_is_eoc(fat32_get_fat_entry(file->current_cluster))) {
+        uint32_t fat_entry = (file->current_cluster >= 2) ? 
+            fat32_get_fat_entry(file->current_cluster) : 0;
+        
+        if (file->current_cluster == 0 || file->current_cluster < 2 || fat32_is_eoc(fat_entry)) {
+            if (file->current_cluster >= 2 && fat32_is_eoc(fat_entry)) {
+                uint32_t new_cluster = fat32_allocate_cluster();
+                if (new_cluster == 0) {
+                    break;
+                }
                 fat32_extend_chain(file->current_cluster, new_cluster);
+                file->current_cluster = new_cluster;
+                memset(file_cluster_buffer, 0, fs->bytes_per_cluster);
+            } else if (file->current_cluster >= 2) {
+                if (!fat32_read_cluster(file->current_cluster, file_cluster_buffer)) {
+                    break;
+                }
             }
-            
-            file->current_cluster = new_cluster;
-            memset(file_cluster_buffer, 0, fs->bytes_per_cluster);
         } else {
             if (!fat32_read_cluster(file->current_cluster, file_cluster_buffer)) {
                 break;
