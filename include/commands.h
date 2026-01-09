@@ -31,6 +31,8 @@ void cmd_cp(int argc, char** argv);
 void cmd_mv(int argc, char** argv);
 void cmd_disk(int argc, char** argv);
 void cmd_write(int argc, char** argv);
+void cmd_catdbg(int argc, char** argv);
+void cmd_writedbg(int argc, char** argv);
 
 #endif
 

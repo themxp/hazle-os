@@ -29,6 +29,8 @@ command_t commands[] = {
     {"mv", "Move/rename file (usage: mv <src> <dst>)", cmd_mv},
     {"disk", "Display disk information", cmd_disk},
     {"write", "Write text to file (usage: write <file> <text>)", cmd_write},
+    {"catdbg", "Debug cat command", cmd_catdbg},
+    {"writedbg", "Debug write command", cmd_writedbg},
 };
 
 int command_count = sizeof(commands) / sizeof(command_t);

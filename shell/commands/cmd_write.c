@@ -7,7 +7,6 @@ void cmd_write(int argc, char** argv) {
     if (argc < 3) {
         display_set_color(DISPLAY_COLOR_YELLOW, DISPLAY_COLOR_BLACK);
         display_writeln("Usage: write <filename> <text>");
-        display_writeln("Example: write test.txt hello world");
         display_set_color(DISPLAY_COLOR_LIGHT_GREY, DISPLAY_COLOR_BLACK);
         return;
     }
@@ -24,7 +23,9 @@ void cmd_write(int argc, char** argv) {
     const char* filename = argv[1];
     
     fat32_file_info_t info;
-    if (!fat32_find_entry(fat32_get_current_dir(), filename, &info)) {
+    bool exists = fat32_find_entry(fat32_get_current_dir(), filename, &info);
+    
+    if (!exists) {
         if (!fat32_create_file(filename)) {
             display_set_color(DISPLAY_COLOR_LIGHT_RED, DISPLAY_COLOR_BLACK);
             display_write("Error: Cannot create file: ");
@@ -43,34 +44,13 @@ void cmd_write(int argc, char** argv) {
         return;
     }
     
-    char text_buffer[512];
-    text_buffer[0] = '\0';
+    char text[128];
+    strncpy(text, argv[2], 120);
+    text[120] = '\n';
+    text[121] = '\0';
+    int text_len = strlen(text);
     
-    for (int i = 2; i < argc; i++) {
-        if (i > 2) {
-            int len = strlen(text_buffer);
-            text_buffer[len] = ' ';
-            text_buffer[len + 1] = '\0';
-        }
-        
-        char* arg = argv[i];
-        if (arg[0] == '"') {
-            arg++;
-        }
-        int arglen = strlen(arg);
-        if (arglen > 0 && arg[arglen - 1] == '"') {
-            arg[arglen - 1] = '\0';
-        }
-        
-        int len = strlen(text_buffer);
-        strcpy(text_buffer + len, arg);
-    }
-    
-    int text_len = strlen(text_buffer);
-    text_buffer[text_len] = '\n';
-    text_len++;
-    
-    int written = fat32_write(fd, text_buffer, text_len);
+    int written = fat32_write(fd, text, text_len);
     fat32_close(fd);
     
     if (written < 0) {
