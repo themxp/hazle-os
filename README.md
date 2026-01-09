@@ -128,13 +128,6 @@ This is a **simple educational OS**. It lacks:
 - [OSDev Wiki](https://wiki.osdev.org) - OS development resources
 - [Intel x86 Manual](https://software.intel.com/en-us/articles/intel-sdm) - CPU architecture
 
-## Why Learn from Hazle OS?
-
-- **Simple**: ~2000 lines of code, easy to understand
-- **Clean**: Well-organized, modular structure
-- **Educational**: Designed specifically for learning
-- **Complete**: Boot to shell, everything from scratch
-
 ## Extending This OS
 
 Want to add more? Try:
