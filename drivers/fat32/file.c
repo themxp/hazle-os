@@ -152,7 +152,9 @@ int fat32_read(int fd, void* buffer, uint32_t size) {
     uint8_t* out = (uint8_t*)buffer;
     uint32_t bytes_read = 0;
     
-    while (bytes_read < size && file->current_cluster >= 2 && !fat32_is_eoc(file->current_cluster)) {
+    while (bytes_read < size && file->current_cluster >= 2) {
+        uint32_t fat_entry = fat32_get_fat_entry(file->current_cluster);
+        
         if (!fat32_read_cluster(file->current_cluster, file_cluster_buffer)) {
             return bytes_read > 0 ? (int)bytes_read : -1;
         }
@@ -170,7 +172,10 @@ int fat32_read(int fd, void* buffer, uint32_t size) {
         file->position += bytes_to_copy;
         
         if (file->position % fs->bytes_per_cluster == 0 && bytes_read < size) {
-            file->current_cluster = fat32_get_fat_entry(file->current_cluster);
+            if (fat32_is_eoc(fat_entry)) {
+                break;
+            }
+            file->current_cluster = fat_entry;
         }
     }
     
