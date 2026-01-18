@@ -68,7 +68,7 @@ $(BUILD_DIR)/userlib/hazle.o: userlib/hazle.c
 	@mkdir -p $(BUILD_DIR)/userlib
 	$(CC) $(USER_CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/bin/%: commands/%.c userlib $(BUILD_DIR)/userlib/crt0.o $(BUILD_DIR)/userlib/hazle.o
+$(BUILD_DIR)/bin/%: system/commands/%.c userlib $(BUILD_DIR)/userlib/crt0.o $(BUILD_DIR)/userlib/hazle.o
 	@mkdir -p $(BUILD_DIR)/bin
 	$(CC) $(USER_CFLAGS) -c $< -o $(BUILD_DIR)/bin/$*.o
 	$(LD) $(USER_LDFLAGS) -o $@ $(BUILD_DIR)/userlib/crt0.o $(BUILD_DIR)/userlib/hazle.o $(BUILD_DIR)/bin/$*.o
@@ -86,12 +86,12 @@ $(DISK_IMAGE): commands
 disk: $(DISK_IMAGE)
 
 clean:
-	rm -rf $(BUILD_DIR) $(ISO_DIR) $(ISO_IMAGE) $(DISK_IMAGE) mnt
+	rm -rf $(BUILD_DIR) $(ISO_DIR) $(ISO_IMAGE) $(DISK_IMAGE)
 
 run: $(ISO_IMAGE)
 	qemu-system-i386 -cdrom $(ISO_IMAGE) -m 256M -vga std
 
-run-disk: $(ISO_IMAGE) $(DISK_IMAGE)
+run-disk:
 	qemu-system-i386 -cdrom $(ISO_IMAGE) -m 256M -vga std -boot d -drive file=$(DISK_IMAGE),format=raw,if=ide
 
 run-fullhd: $(ISO_IMAGE)
