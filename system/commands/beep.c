@@ -1,4 +1,4 @@
-#include "../userlib/hazle.h"
+#include "../../userlib/hazle.h"
 
 int main(int argc, char **argv) {
     int freq = 1000;

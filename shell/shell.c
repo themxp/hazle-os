@@ -6,13 +6,66 @@
 #include "exec.h"
 #include "sysconf.h"
 #include "fat32.h"
+#include "timer.h"
+#include "io.h"
 
 static char input_buffer[SHELL_BUFFER_SIZE];
 static int buffer_pos = 0;
 static bool shell_running = true;
 
+static void do_reboot(void) {
+    display_writeln("rebooting...");
+    outb(0x64, 0xFE);
+    while (1) {
+        __asm__ volatile("hlt");
+    }
+}
+
+static void do_shutdown(void) {
+    display_writeln("system halted.");
+    disable_interrupts();
+    while (1) {
+        __asm__ volatile("hlt");
+    }
+}
+
+static int parse_time(const char *arg) {
+    if (strcmp(arg, "now") == 0) {
+        return 0;
+    }
+    
+    int len = strlen(arg);
+    if (len < 2) {
+        return 60;
+    }
+    
+    char unit = arg[len - 1];
+    char num_str[16];
+    strncpy(num_str, arg, len - 1);
+    num_str[len - 1] = '\0';
+    
+    int value = 0;
+    for (int i = 0; num_str[i]; i++) {
+        if (num_str[i] >= '0' && num_str[i] <= '9') {
+            value = value * 10 + (num_str[i] - '0');
+        }
+    }
+    
+    if (value == 0) value = 1;
+    
+    switch (unit) {
+        case 's': return value;
+        case 'm': return value * 60;
+        case 'h': return value * 3600;
+        default:  return 60;
+    }
+}
+
 static bool is_builtin(const char *cmd) {
-    return strcmp(cmd, "cd") == 0 || strcmp(cmd, "exit") == 0;
+    return strcmp(cmd, "cd") == 0 || 
+           strcmp(cmd, "exit") == 0 ||
+           strcmp(cmd, "reboot") == 0 ||
+           strcmp(cmd, "shutdown") == 0;
 }
 
 static int run_builtin(const char *cmd, int argc, char **argv) {
@@ -32,6 +85,46 @@ static int run_builtin(const char *cmd, int argc, char **argv) {
     
     if (strcmp(cmd, "exit") == 0) {
         shell_running = false;
+        return 0;
+    }
+    
+    if (strcmp(cmd, "reboot") == 0) {
+        do_reboot();
+        return 0;
+    }
+    
+    if (strcmp(cmd, "shutdown") == 0) {
+        int seconds = 60;
+        
+        if (argc >= 2) {
+            seconds = parse_time(argv[1]);
+        }
+        
+        if (seconds == 0) {
+            do_shutdown();
+        } else {
+            display_write("shutdown in ");
+            char buf[16];
+            if (seconds >= 3600) {
+                itoa(seconds / 3600, buf, 10);
+                display_write(buf);
+                display_writeln(" hour(s)...");
+            } else if (seconds >= 60) {
+                itoa(seconds / 60, buf, 10);
+                display_write(buf);
+                display_writeln(" minute(s)...");
+            } else {
+                itoa(seconds, buf, 10);
+                display_write(buf);
+                display_writeln(" second(s)...");
+            }
+            
+            uint32_t target = timer_get_ticks() + (seconds * 1000);
+            while (timer_get_ticks() < target) {
+                __asm__ volatile("hlt");
+            }
+            do_shutdown();
+        }
         return 0;
     }
     

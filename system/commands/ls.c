@@ -1,5 +1,5 @@
-#include "../userlib/hazle.h"
-#include "../userlib/syscall.h"
+#include "../../userlib/hazle.h"
+#include "../../userlib/syscall.h"
 
 typedef struct {
     char name[256];

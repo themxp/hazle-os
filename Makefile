@@ -25,7 +25,7 @@ KERNEL_BIN = $(BUILD_DIR)/hazle.bin
 ISO_IMAGE = hazle-os.iso
 DISK_IMAGE = disk.img
 
-COMMANDS = echo clear pwd reboot help info mem time uptime beep color calc random disk mkdir touch rm cp mv cat ls write date debug
+COMMANDS = echo clear pwd help info mem time uptime beep color calc random disk mkdir touch rm cp mv cat ls write date debug
 
 .PHONY: all clean run run-fullhd debug iso disk run-disk commands userlib
 

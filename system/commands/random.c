@@ -1,4 +1,4 @@
-#include "../userlib/hazle.h"
+#include "../../userlib/hazle.h"
 
 static unsigned int seed = 12345;
 

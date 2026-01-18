@@ -1,4 +1,4 @@
-#include "../userlib/hazle.h"
+#include "../../userlib/hazle.h"
 
 int main(int argc, char **argv) {
     for (int i = 1; i < argc; i++) {
