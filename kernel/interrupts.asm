@@ -20,3 +20,15 @@ timer_interrupt_handler:
     popa
     iret
 
+global syscall_interrupt_handler
+extern syscall_dispatch
+
+syscall_interrupt_handler:
+    push edx
+    push ecx
+    push ebx
+    push eax
+    call syscall_dispatch
+    add esp, 16
+    iret
+

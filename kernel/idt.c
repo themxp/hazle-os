@@ -3,6 +3,7 @@
 #include "io.h"
 #include "keyboard.h"
 #include "timer.h"
+#include "syscall.h"
 
 typedef struct {
     uint16_t base_low;
@@ -40,6 +41,7 @@ void idt_init(void) {
     
     idt_set_gate(32, (uint32_t)timer_interrupt_handler, 0x08, 0x8E);
     idt_set_gate(33, (uint32_t)keyboard_interrupt_handler, 0x08, 0x8E);
+    idt_set_gate(0x80, (uint32_t)syscall_interrupt_handler, 0x08, 0xEE);
     
     idt_flush();
 }

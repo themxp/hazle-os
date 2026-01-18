@@ -1,0 +1,14 @@
+[system]
+version=1.0.0
+name=Hazle OS
+
+[paths]
+bin=/usr/bin
+
+[shell]
+prompt=hazle@os:$
+history_size=50
+
+[display]
+default_fg=7
+default_bg=0

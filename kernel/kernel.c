@@ -9,6 +9,10 @@
 #include "multiboot.h"
 #include "vesa.h"
 #include "framebuffer.h"
+#include "heap.h"
+#include "syscall.h"
+#include "fat32.h"
+#include "block.h"
 
 system_info_t system_info;
 
@@ -58,6 +62,10 @@ void kernel_main(uint32_t magic, uint32_t addr) {
     keyboard_init();
     rtc_init();
     speaker_init();
+    syscall_init();
+    heap_init();
+    fat32_init();
+    fat32_mount();
     
     system_info.total_memory = 128 * 1024 * 1024;
     system_info.used_memory = 2 * 1024 * 1024;

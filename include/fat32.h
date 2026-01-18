@@ -131,7 +131,7 @@ typedef struct {
     uint16_t creation_time;
     uint16_t modification_date;
     uint16_t modification_time;
-} fat32_file_info_t;
+} __attribute__((packed)) fat32_file_info_t;
 
 bool fat32_init(void);
 bool fat32_mount(void);
